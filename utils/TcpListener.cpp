@@ -12,7 +12,7 @@ TcpListener::TcpListener(std::string port) : SocketImpl(SOCK_STREAM, AI_PASSIVE,
 	free_serve_info();
 }
 
-void TcpListener::start_listening(TcpMessageHandler handler, void *m, int msg_length) {
+void TcpListener::start_listening(SocketMessageHandler handler, void *m, int msg_length) {
 
 	fd_set master;    // master file descriptor list
 	fd_set read_fds;  // temp file descriptor list for select()

@@ -3,11 +3,10 @@
 
 #include "SocketImpl.h"
 
-typedef void (*TcpMessageHandler)(void *);
 class TcpListener: public SocketImpl {
 	public:
 		TcpListener(std::string port);
-		void start_listening(TcpMessageHandler handler, void *m, int msg_length);
+		void start_listening(SocketMessageHandler handler, void *m, int msg_length);
 };
 
 #endif

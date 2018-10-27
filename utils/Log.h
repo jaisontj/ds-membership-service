@@ -12,6 +12,7 @@ class Log {
 		static void d(std::string message);
 		static void e(std::string message);
 		static void i(std::string message);
+		static void p(std::string message);
 };
 
 #endif

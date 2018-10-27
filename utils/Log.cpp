@@ -25,3 +25,7 @@ void Log::i(std::string message) {
 		std::cout<<message<<std::endl;
 	}
 }
+
+void Log::p(std::string message) {
+	std::cout<<message<<std::endl;
+}
