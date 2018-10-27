@@ -8,6 +8,7 @@
 #include "RequestIdProvider.h"
 #include "MembershipList.h"
 #include "ReqMessageOkCollecter.h"
+#include "FailureDetector.h"
 
 #include "../utils/Log.h"
 
@@ -29,12 +30,11 @@ std::vector<uint32_t> convert_to_vector(uint32_t peer_list) {
 
 void update_membership_and_send_to_all(ReqMessage req_m) {
 	uint32_t new_peer_id = req_m.peer_id;
-	MembershipList::get_instance().increment_view_id();
-	MembershipList::get_instance().add_new_peer(new_peer_id);
 	std::vector<uint32_t> peer_list = MembershipList::get_instance().get_peer_list();
+	peer_list.push_back(new_peer_id);
 	NewViewMessage nm = NewViewMessage();
 	nm.type = 4;
-	nm.view_id = MembershipList::get_instance().get_view_id();
+	nm.view_id = MembershipList::get_instance().get_view_id() + 1;
 	nm.peer_list = convert_to_int_list(peer_list);
 	Log::i("Sending NEWVIEW message to all");
 	send_message(peer_list, (void *) &nm, sizeof nm);
@@ -91,6 +91,8 @@ void handle_newview_message(NewViewMessage nvm) {
 	MembershipList::get_instance().print();
 	//Delete saved data
 	saved_req_message = NULL;
+	//Add members to failure detector
+	FailureDetector::get_instance().replace_peers(peer_list);
 }
 
 void tcp_message_handler(void *message) {
