@@ -4,6 +4,7 @@
 #include<string>
 #include<arpa/inet.h>
 
+typedef void (*SocketMessageHandler)(void *);
 class SocketImpl {
 
 	struct addrinfo *servinfo;
