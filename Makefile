@@ -23,12 +23,16 @@ $(TARGET): $(MAIN)
 run: $(TARGET)
 	./$(TARGET) -p $(PORT) -h $(HOSTFILE) -v verbose
 
+runtest4: $(TARGET)
+	./$(TARGET) -p $(PORT) -h $(HOSTFILE) -t 4 -v verbose
+
 generate:
 	echo "vdi-linux-030.ccs.neu.edu" >> hostnames.txt
 	echo "vdi-linux-031.ccs.neu.edu" >> hostnames.txt
 	echo "vdi-linux-032.ccs.neu.edu" >> hostnames.txt
 	echo "vdi-linux-033.ccs.neu.edu" >> hostnames.txt
 	echo "vdi-linux-034.ccs.neu.edu" >> hostnames.txt
+	echo "vdi-linux-035.ccs.neu.edu" >> hostnames.txt
 
 generatelocal:
 	echo "Jaisons-MacBook-Pro.local" >> hostnames.txt
