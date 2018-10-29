@@ -91,11 +91,12 @@ void handle_peer_crash(uint32_t peer_id) {
 	m.view_id = MembershipList::get_instance().get_view_id();
 	m.op_type = 2;
 	m.peer_id = peer_id;
-	size_t membership_size = MembershipList::get_instance().get_peer_list().size();
+	std::vector<uint32_t> alive_peers = remove_from_vector(MembershipList::get_instance().get_peer_list(), peer_id);
+	size_t membership_size = alive_peers.size();
 	if (membership_size == 0) {
 		Log::f("Trying to remove peer from an empty membership. Crashing program.");
 	}
-	send_to_all_members((void *) &m, sizeof m);
+	send_message(alive_peers, (void *) &m, sizeof m);
 	collecter.set_req_message(m, membership_size, update_membership_and_send_to_all);
 }
 
