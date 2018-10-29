@@ -30,8 +30,7 @@ void start_tcp_listener(CommandArgs c_args) {
 		listener.start_listening(&tcp_message_handler, new NetworkMessage(), sizeof (NetworkMessage));
 		listener.close_socket();
 	} catch (string m) {
-		Log::p("MAIN:: Error listening on tcp: " + m);
-		exit(1);
+		Log::f("MAIN:: Error listening on tcp: " + m);
 	}
 }
 
@@ -46,8 +45,15 @@ void start_heartbeat_listener(CommandArgs c_args) {
 		HeartBeat hb = HeartBeat();
 		listener.start_listening(handle_heartbeat_message, (void *) &hb, sizeof(HeartBeat));
 	} catch(string m) {
-		Log::p("MAIN:: Heartbeat listener failed -> " + m);
-		exit(1);
+		Log::f("MAIN:: Heartbeat listener failed -> " + m);
+	}
+}
+
+void handled_failed_peer(uint32_t peer_id) {
+	if (ProcessInfoHelper::is_leader()) {
+		handle_peer_crash(peer_id);
+	} else {
+		Log::p("Peer " + to_string(peer_id) + " not reachable. Expecting leader to handle.");
 	}
 }
 
@@ -61,12 +67,11 @@ int main(int argc, char* argv[]) {
 	try {
 		send_leader_join();
 	} catch (std::string m) {
-		Log::p("MAIN:: Could not send join to leader. Message-> " + m);
-		exit(1);
+		Log::f("MAIN:: Could not send join to leader. Message-> " + m);
 	}
 	thread udp_listener(start_heartbeat_listener, c_args);
 	udp_listener.detach();
-	FailureDetector::get_instance().start();
+	FailureDetector::get_instance().start(handled_failed_peer);
 	tcp_listener.join();
 	return 0;
 }

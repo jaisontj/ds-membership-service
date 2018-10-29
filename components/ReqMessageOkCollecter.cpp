@@ -1,7 +1,7 @@
 #include "ReqMessageOkCollecter.h"
+#include "../utils/Log.h"
 
-ReqMessageOkCollecter::ReqMessageOkCollecter() {
-}
+ReqMessageOkCollecter::ReqMessageOkCollecter() {}
 
 void ReqMessageOkCollecter::set_req_message(ReqMessage rm, uint32_t expected_ok_count, ReqMessageConfirmationHandler handler) {
 	this->m = rm;
@@ -12,7 +12,8 @@ void ReqMessageOkCollecter::set_req_message(ReqMessage rm, uint32_t expected_ok_
 
 void ReqMessageOkCollecter::handle_ok_message(OkMessage om) {
 	if (om.req_id != m.req_id && om.view_id == m.view_id) {
-		throw std::string("Wrong okmessage for request");
+		Log::e("Wrong okmessage for request. Crashing program.");
+		exit(1);
 	}
 
 	this->count.store(this->count.load() + 1);

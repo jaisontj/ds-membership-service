@@ -28,10 +28,28 @@ std::vector<uint32_t> convert_to_vector(uint32_t peer_list) {
 	return p_list;
 }
 
+std::vector<uint32_t> remove_from_vector(std::vector<uint32_t> peer_list, uint32_t id) {
+	for (uint32_t i = 0;i<peer_list.size();i++) {
+		if (peer_list[i] == id) {
+			peer_list.erase(peer_list.begin() + i);
+			return peer_list;
+		}
+	}
+	Log::f("MessageHandler:: Peer to be removed not found in list");
+	exit(1);
+}
+
+
 void update_membership_and_send_to_all(ReqMessage req_m) {
 	uint32_t new_peer_id = req_m.peer_id;
 	std::vector<uint32_t> peer_list = MembershipList::get_instance().get_peer_list();
-	peer_list.push_back(new_peer_id);
+	switch (req_m.op_type) {
+		case 1: peer_list.push_back(new_peer_id);
+				break;
+		case 2: peer_list = remove_from_vector(peer_list, new_peer_id);
+				break;
+		default: Log::f("Unhandled op type for req.");
+	}
 	NewViewMessage nm = NewViewMessage();
 	nm.type = 4;
 	nm.view_id = MembershipList::get_instance().get_view_id() + 1;
@@ -65,14 +83,29 @@ void handle_join_request(JoinMessage jm) {
 	collecter.set_req_message(req_m, size, update_membership_and_send_to_all);
 }
 
+void handle_peer_crash(uint32_t peer_id) {
+	//Only handle if leader
+	ReqMessage m = ReqMessage();
+	m.type = 2;
+	m.req_id = RequestIdProvider::get_instance().get_new_req_id();
+	m.view_id = MembershipList::get_instance().get_view_id();
+	m.op_type = 2;
+	m.peer_id = peer_id;
+	size_t membership_size = MembershipList::get_instance().get_peer_list().size();
+	if (membership_size == 0) {
+		Log::f("Trying to remove peer from an empty membership. Crashing program.");
+	}
+	send_to_all_members((void *) &m, sizeof m);
+	collecter.set_req_message(m, membership_size, update_membership_and_send_to_all);
+}
+
 ReqMessage *saved_req_message;
 
 void handle_req_message(ReqMessage rm) {
 	Log::i("Received ReqMessage-> ReqId: " + std::to_string(rm.req_id) + " ViewId: " + std::to_string(rm.view_id) + "OP Type: " + std::to_string(rm.op_type) + " PeerId: " + std::to_string(rm.peer_id));
 	//save operation.
 	if (saved_req_message != NULL) {
-		Log::e("MessageHandler:: Cannot save more than one operation.");
-		throw std::string("Cannot save more than one operation.");
+		Log::f("MessageHandler:: Cannot save more than one operation.");
 	}
 	saved_req_message = &rm;
 	//Send OK to leader
@@ -99,8 +132,7 @@ void tcp_message_handler(void *message) {
 	NetworkMessage *m = (NetworkMessage *) message;
 	if (m->msg_type == 1) {
 		if (!ProcessInfoHelper::is_leader()) {
-			Log::e("MessageHandler:: Process who is NOT a leader is receiving a join");
-			throw std::string("Process who is NOT a leader is receiving a join");
+			Log::f("MessageHandler:: Process who is NOT a leader is receiving a join");
 		}
 		JoinMessage jm = *(JoinMessage *) message;
 		handle_join_request(jm);
@@ -113,8 +145,7 @@ void tcp_message_handler(void *message) {
 	}
 	if (m->msg_type == 3) {
 		if (!ProcessInfoHelper::is_leader()) {
-			Log::e("MessageHandler:: Process who is NOT a leader is receiving an OK message.");
-			throw std::string("Process who is NOT a leader is receiving OK message.");
+			Log::f("MessageHandler:: Process who is NOT a leader is receiving an OK message.");
 		}
 		OkMessage om = *(OkMessage *) message;
 		handle_ok_message(om);
