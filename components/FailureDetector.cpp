@@ -22,7 +22,7 @@ void FailureDetector::send_heartbeat_to_all(HeartBeat hb) {
 		if (sent_bytes == -1) {
 			Log::e("Failed to send hearbeat to " + p.info.hostname);
 		} else {
-			Log::i("Sent heartbeat to " + p.info.hostname);
+			Log::v("Sent heartbeat to " + p.info.hostname);
 		}
 	}
 }
