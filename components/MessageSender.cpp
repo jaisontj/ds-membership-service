@@ -11,13 +11,12 @@ void send_message(std::string hostname, std::string port, void *m, size_t m_size
 		TcpSender sender = TcpSender(hostname, port);
 		sender.send(m, m_size);
 		sender.free_serve_info();
-		//sender.close_socket();
+		sender.close_socket();
 	} catch(std::string m) {
-		std::string message = "MessageSender:: failed to send message via tcp-> " + m;
+		Log::e("MessageSender:: failed to send message to " + hostname + " via tcp-> " + m);
 		if (crash_on_fail) {
-			Log::f(message);
+			send_message(hostname, port, &m, m_size, crash_on_fail);
 		}
-		Log::e(message);
 	}
 }
 

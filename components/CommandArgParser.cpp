@@ -15,7 +15,7 @@ CommandArgs parse_cmg_args(int argc, char* argv[]) {
 	std::string port = "";
 	std::string filepath;
 	std::string test = "";
-	while((opt = getopt(argc, argv, "p:h:v:t")) != -1) {
+	while((opt = getopt(argc, argv, "p:h:v:t:")) != -1) {
 		switch(opt) {
 			case 'p':
 				temp_port = atoi(optarg);

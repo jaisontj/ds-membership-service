@@ -8,13 +8,15 @@ void NewLeaderResponseHandler::setup(uint32_t req_id, PendingOpsHandler handler)
 
 void NewLeaderResponseHandler::handle_response(ReqMessage message) {
 	if (message.op_type == OP_PENDING) {
-		Log::i("Received PENDING in NEW_LEADER_RESPONSE. Weird. Should not happen. Ignoring..");
+		Log::i("NewLeaderResponseHandler:: Received PENDING in NEW_LEADER_RESPONSE. Weird. Should not happen. Ignoring..");
 		return;
 	}
 	if (message.req_id != this->req_id) {
-		Log::i("Received NEW_LEADER_RESPONSE with different Req_id. Ignoring this message.");
+		Log::i("NewLeaderResponseHandler:: Received NEW_LEADER_RESPONSE with different Req_id. Ignoring this message.");
 		return;
 	}
+	std::string m = "Type: " + std::to_string(message.type) + " Req_id: " + std::to_string(message.req_id) + " View_id: " + std::to_string(message.view_id) + " OP_Type: " + std::to_string(message.op_type) + " Peer_id: " + std::to_string(message.peer_id);
+	Log::i("Received NewLeaderResponse: " + m);
 	//if op type is NOTHING, ignore
 	if (message.op_type == OP_NOTHING) return;
 	bool copy_exists = false;

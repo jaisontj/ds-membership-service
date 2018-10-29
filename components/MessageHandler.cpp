@@ -1,5 +1,6 @@
 #include <vector>
-#include<bitset>
+#include <bitset>
+#include <unistd.h>
 
 #include "MessageHandler.h"
 #include "MessageSender.h"
@@ -47,6 +48,7 @@ std::vector<uint32_t> remove_from_vector(std::vector<uint32_t> peer_list, uint32
 }
 
 void update_leader(uint32_t new_leader_id) {
+	MembershipList::get_instance().remove_peer(ProcessInfoHelper::LEADER.id);
 	ProcessInfo leader_info = ProcessInfoHelper::get_process_info(new_leader_id);
 	ProcessInfoHelper::LEADER = leader_info;
 }
@@ -96,6 +98,7 @@ void initiate_2pc_add_peer(uint32_t new_peer_id) {
 			try {
 				std::vector<uint32_t> alive_peers = remove_from_vector(MembershipList::get_instance().get_peer_list(), MembershipList::get_instance().get_next_leader_id());
 				send_message(alive_peers, (void *) &req_m, sizeof req_m);
+				sleep(2);
 				Log::f("Executing Test case 4: Crashing leader after sending ADD message to all except next leader, on adding the 6th peer.");
 			} catch (std::string m) {
 				Log::f("MessageHandler: Failed executing test case 4");
@@ -125,6 +128,7 @@ void initiate_2pc_remove_peer(uint32_t peer_id) {
 		try {
 			alive_peers = remove_from_vector(alive_peers, MembershipList::get_instance().get_next_leader_id());
 			send_message(alive_peers, (void *) &m, sizeof m);
+			sleep(2);
 			Log::f("Executing Test case 4: Crashing leader after sending DEL message to all peers except next leader");
 		} catch (std::string m) {
 			Log::f("MessageHandler: Failed executing test case 4");
@@ -164,7 +168,6 @@ void handle_leader_failure(uint32_t leader_id) {
 	}
 	//Handle if next in line to be leader
 	Log::i("Assuming leadership ya'll!!!");
-	update_leader(ProcessInfoHelper::SELF.id);
 	//send NEWLEADER to all except crashed leader.
 	NewLeaderMessage m = NewLeaderMessage();
 	m.type = NEW_LEADER;
@@ -173,8 +176,8 @@ void handle_leader_failure(uint32_t leader_id) {
 	m.op_type = OP_PENDING;
 	std::vector<uint32_t> alive_peers = remove_from_vector(MembershipList::get_instance().get_peer_list(), leader_id);
 	//send message to all alive, but do not crash on fail because someother process also may have crashed.
-	send_message(alive_peers, (void *) &m, sizeof m, false);
 	nlr_handler.setup(m.req_id, &handle_pending_op);
+	send_message(alive_peers, (void *) &m, sizeof m, false);
 }
 
 void handle_peer_crash(uint32_t peer_id) {
@@ -192,15 +195,15 @@ void handle_peer_crash(uint32_t peer_id) {
 	initiate_2pc_remove_peer(peer_id);
 }
 
-ReqMessage *saved_req_message;
+ReqMessage saved_req_message;
 
 void handle_req_message(ReqMessage rm) {
 	Log::i("Received ReqMessage-> ReqId: " + std::to_string(rm.req_id) + " ViewId: " + std::to_string(rm.view_id) + "OP Type: " + std::to_string(rm.op_type) + " PeerId: " + std::to_string(rm.peer_id));
 	//save operation.
-	if (saved_req_message != NULL) {
+	if (saved_req_message.type != 0) {
 		Log::f("MessageHandler:: Cannot save more than one operation.");
 	}
-	saved_req_message = &rm;
+	saved_req_message = rm;
 	//Send OK to leader
 	OkMessage m = OkMessage();
 	m.type = OK;
@@ -216,7 +219,7 @@ void handle_newview_message(NewViewMessage nvm) {
 	MembershipList::get_instance().set_peer_list(peer_list);
 	MembershipList::get_instance().print();
 	//Delete saved data
-	saved_req_message = NULL;
+	saved_req_message.type = 0;
 	//Add members to failure detector
 	FailureDetector::get_instance().replace_peers(peer_list);
 }
@@ -235,11 +238,11 @@ void handle_newleader_message(NewLeaderMessage nlm) {
 	m.view_id = MembershipList::get_instance().get_view_id();
 	//Send NOTHING back by default
 	m.op_type = OP_NOTHING;
-	if (saved_req_message != NULL) {
-		m.op_type = saved_req_message->op_type;
-		m.peer_id = saved_req_message->peer_id;
+	if (saved_req_message.type != 0) {
+		m.op_type = saved_req_message.op_type;
+		m.peer_id = saved_req_message.peer_id;
 		//Delegated to leader. Expected to happen again.
-		saved_req_message = NULL;
+		saved_req_message.type = 0;
 	}
 	//send response to leader.
 	send_message(ProcessInfoHelper::LEADER, (void *) &m, sizeof m);

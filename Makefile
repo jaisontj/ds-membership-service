@@ -21,10 +21,10 @@ $(TARGET): $(MAIN)
 	$(CC) $(CFLAGS) $(UTILS_FILES) $(COMPONENTS) $(MAIN) -o $(TARGET)
 
 run: $(TARGET)
-	./$(TARGET) -p $(PORT) -h $(HOSTFILE) -v verbose
+	./$(TARGET) -p $(PORT) -h $(HOSTFILE) -v info
 
 runtest4: $(TARGET)
-	./$(TARGET) -p $(PORT) -h $(HOSTFILE) -t 4 -v verbose
+	./$(TARGET) -p $(PORT) -h $(HOSTFILE) -t 4 -v info
 
 generate:
 	echo "vdi-linux-030.ccs.neu.edu" >> hostnames.txt

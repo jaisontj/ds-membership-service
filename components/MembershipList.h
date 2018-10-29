@@ -23,6 +23,7 @@ class MembershipList {
 		std::vector<uint32_t> get_peer_list();
 		void print();
 		uint32_t get_next_leader_id();
+		void remove_peer(uint32_t peer_id);
 };
 
 #endif
