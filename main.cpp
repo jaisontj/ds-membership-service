@@ -50,10 +50,11 @@ void start_heartbeat_listener(CommandArgs c_args) {
 }
 
 void handled_failed_peer(uint32_t peer_id) {
+	Log::p("Peer " + to_string(peer_id) + " not reachable.");
 	if (ProcessInfoHelper::is_leader()) {
 		handle_peer_crash(peer_id);
 	} else {
-		Log::p("Peer " + to_string(peer_id) + " not reachable. Expecting leader to handle.");
+		Log::p("Expecting leader to handle.");
 	}
 }
 
