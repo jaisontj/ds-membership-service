@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIRECTORY="/home/jaison/CS7610/projects/project2/part2"
+DIRECTORY="/home/jaison/CS7610/projects/project2/part3"
 BUILD="make buildccs"
 
 rsync -av --exclude='.git/' --exclude='*.swp' ~/Documents/masters/CS7610/projects/project2/ jaison@login.ccs.neu.edu:$DIRECTORY

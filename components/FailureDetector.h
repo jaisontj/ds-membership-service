@@ -16,10 +16,13 @@ struct PeerHBTrack{
 	time_t next_hb_at;
 };
 
+typedef void (*FailedPeerHandler)(uint32_t peer_id);
+
 class FailureDetector {
 	private:
 		std::mutex m;
 		std::vector<PeerHBTrack> peer_list;
+		FailedPeerHandler handler;
 		FailureDetector();
 		void start_heartbeat();
 		void start_detection();
@@ -35,7 +38,7 @@ class FailureDetector {
 		void replace_peers(std::vector<uint32_t> peers);
 		void remove_peer(ProcessInfo p_info);
 		void handle_heartbeat(HeartBeat hb);
-		void start();
+		void start(FailedPeerHandler handler);
 };
 
 #endif

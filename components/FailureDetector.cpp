@@ -97,13 +97,14 @@ void FailureDetector::start_detection() {
 	while(true) {
 		PeerHBTrack* failed_peer = get_failed_peer();
 		if (failed_peer != NULL) {
-			print_failure(failed_peer->info.id);
+			this->handler(failed_peer->info.id);
 			remove_peer(failed_peer->info);
 		}
 	}
 }
 
-void FailureDetector::start() {
+void FailureDetector::start(FailedPeerHandler handler) {
+	this->handler = handler;
 	//start sending heartbeats
 	std::thread t1(&FailureDetector::start_heartbeat, this);
 	t1.detach();
