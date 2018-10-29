@@ -38,5 +38,8 @@ struct NetworkMessage {
 
 //OP type
 //1 - ADD
+//2 - DEL
+//3 - PENDING
+//4 - NOTHING
 
 #endif

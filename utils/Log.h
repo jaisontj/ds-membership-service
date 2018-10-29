@@ -13,6 +13,7 @@ class Log {
 		static void e(std::string message);
 		static void i(std::string message);
 		static void p(std::string message);
+		static void f(std::string message);
 };
 
 #endif
