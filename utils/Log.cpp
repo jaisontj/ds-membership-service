@@ -29,3 +29,9 @@ void Log::i(std::string message) {
 void Log::p(std::string message) {
 	std::cout<<message<<std::endl;
 }
+
+void Log::f(std::string message) {
+	std::cout<<"FATAL ERROR: "<<message<<std::endl;
+	std::cout<<"Exiting Program."<<std::endl;
+	exit(1);
+}
