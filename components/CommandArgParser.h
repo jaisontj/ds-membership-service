@@ -6,6 +6,7 @@
 struct CommandArgs {
 	std::string port;
 	std::string filename;
+	std::string testcase;
 };
 
 CommandArgs parse_cmg_args(int, char* []);

@@ -7,15 +7,15 @@
 #include "../utils/Log.h"
 
 void show_usage_and_exit() {
-	std::cout<<"Usage: -p port -h hostfile -c count"<<std::endl;
-	exit(0);
+	Log::f("Usage: -p port -h hostfile -c count");
 }
 
 CommandArgs parse_cmg_args(int argc, char* argv[]) {
 	int opt, temp_port;
 	std::string port = "";
 	std::string filepath;
-	while((opt = getopt(argc, argv, "p:h:v:")) != -1) {
+	std::string test = "";
+	while((opt = getopt(argc, argv, "p:h:v:t:")) != -1) {
 		switch(opt) {
 			case 'p':
 				temp_port = atoi(optarg);
@@ -34,6 +34,9 @@ CommandArgs parse_cmg_args(int argc, char* argv[]) {
 				if (strcmp(optarg, "error") == 0) Log::LOG_LEVEL = ERROR;
 				if (strcmp(optarg, "info") == 0) Log::LOG_LEVEL = INFO;
 				break;
+			case 't':
+				test = optarg;
+				break;
 			default:
 				show_usage_and_exit();
 				break;
@@ -42,7 +45,7 @@ CommandArgs parse_cmg_args(int argc, char* argv[]) {
 
 	if(port == "" || filepath == "")
 		show_usage_and_exit();
-	return (CommandArgs) { port, filepath };
+	return (CommandArgs) { port, filepath, test };
 }
 
 

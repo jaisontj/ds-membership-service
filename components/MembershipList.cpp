@@ -18,6 +18,16 @@ void MembershipList::add_new_peer(uint32_t p_id) {
 	this->peers.push_back(p_id);
 }
 
+void MembershipList::remove_peer(uint32_t p_id) {
+	std::lock_guard<std::mutex> lk(m);
+	for (uint32_t i = 0; i < this->peers.size(); i++) {
+		if (peers[i] == p_id) {
+			this->peers.erase(this->peers.begin() + i);
+			break;
+		}
+	}
+}
+
 std::vector<uint32_t> MembershipList::get_peer_list() {
 	std::lock_guard<std::mutex> lk(m);
 	return peers;
@@ -45,3 +55,12 @@ void MembershipList::print() {
 	}
 	std::cout<<"-----------------------------------------------------------------------------------"<<std::endl;
 }
+
+uint32_t MembershipList::get_next_leader_id() {
+	std::vector<uint32_t> p_list = this->get_peer_list();
+	if (p_list.size() == 1) {
+		throw std::string("There can be no next leader");
+	}
+	return p_list[1];
+}
+

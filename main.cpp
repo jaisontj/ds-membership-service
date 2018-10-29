@@ -50,17 +50,15 @@ void start_heartbeat_listener(CommandArgs c_args) {
 }
 
 void handled_failed_peer(uint32_t peer_id) {
-	Log::p("Peer " + to_string(peer_id) + " not reachable.");
-	if (ProcessInfoHelper::is_leader()) {
-		handle_peer_crash(peer_id);
-	} else {
-		Log::p("Expecting leader to handle.");
-	}
+	handle_peer_crash(peer_id);
 }
-
 
 int main(int argc, char* argv[]) {
 	CommandArgs c_args = parse_cmg_args(argc, argv);
+	//Test case
+	if (!c_args.testcase.empty()) {
+		simulate_test(c_args.testcase);
+	}
 	ProcessInfoHelper::init_from_file(c_args.filename, c_args.port);
 	thread tcp_listener(start_tcp_listener, c_args);
 	ProcessInfo leader = ProcessInfoHelper::LEADER;
