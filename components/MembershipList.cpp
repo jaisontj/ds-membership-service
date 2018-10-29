@@ -45,3 +45,12 @@ void MembershipList::print() {
 	}
 	std::cout<<"-----------------------------------------------------------------------------------"<<std::endl;
 }
+
+uint32_t MembershipList::get_next_leader_id() {
+	std::vector<uint32_t> p_list = this->get_peer_list();
+	if (p_list.size() == 1) {
+		throw std::string("There can be no next leader");
+	}
+	return p_list[1];
+}
+

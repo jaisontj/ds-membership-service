@@ -11,7 +11,7 @@ HOSTFILE = hostnames.txt
 
 UTILS_FILES = utils/Log.cpp utils/SocketImpl.cpp utils/TcpListener.cpp utils/TcpSender.cpp utils/UdpSender.cpp utils/UdpListener.cpp
 
-COMPONENTS = components/CommandArgParser.cpp components/MembershipList.cpp components/ReqMessageOkCollecter.cpp components/ProcessInfoHelper.cpp components/MessageHandler.cpp components/MessageSender.cpp components/RequestIdProvider.cpp components/FailureDetector.cpp
+COMPONENTS = components/CommandArgParser.cpp components/MembershipList.cpp components/ReqMessageOkCollecter.cpp components/ProcessInfoHelper.cpp components/MessageHandler.cpp components/MessageSender.cpp components/RequestIdProvider.cpp components/FailureDetector.cpp components/NewLeaderResponseHandler.cpp
 
 buildccs: clean build
 

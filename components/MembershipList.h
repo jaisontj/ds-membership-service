@@ -22,6 +22,7 @@ class MembershipList {
 		uint32_t get_view_id();
 		std::vector<uint32_t> get_peer_list();
 		void print();
+		uint32_t get_next_leader_id();
 };
 
 #endif

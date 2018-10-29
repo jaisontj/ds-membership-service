@@ -51,6 +51,6 @@ ProcessInfo ProcessInfoHelper::get_process_info(uint32_t id) {
 }
 
 bool ProcessInfoHelper::is_leader() {
-	return SELF.id == 1;
+	return SELF.id == LEADER.id;
 }
 

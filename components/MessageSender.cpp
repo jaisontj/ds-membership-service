@@ -6,14 +6,18 @@
 #include "../utils/TcpSender.h"
 #include "../utils/Log.h"
 
-void send_message(std::string hostname, std::string port, void *m, size_t m_size) {
+void send_message(std::string hostname, std::string port, void *m, size_t m_size, bool crash_on_fail) {
 	try {
 		TcpSender sender = TcpSender(hostname, port);
 		sender.send(m, m_size);
 		sender.free_serve_info();
 		//sender.close_socket();
 	} catch(std::string m) {
-		Log::f("MessageSender:: failed to send message via tcp-> " + m);
+		std::string message = "MessageSender:: failed to send message via tcp-> " + m;
+		if (crash_on_fail) {
+			Log::f(message);
+		}
+		Log::e(message);
 	}
 }
 
@@ -22,10 +26,10 @@ void send_message(ProcessInfo pInfo, void *m, size_t m_size) {
 	send_message(pInfo.hostname, pInfo.port, m, m_size);
 }
 
-void send_message(std::vector<uint32_t> peer_list, void *m, size_t m_size) {
+void send_message(std::vector<uint32_t> peer_list, void *m, size_t m_size, bool crash_on_fail) {
 	for (auto const &peer_id: peer_list) {
 		ProcessInfo info = ProcessInfoHelper::get_process_info(peer_id);
-		send_message(info.hostname, info.port, m, m_size);
+		send_message(info.hostname, info.port, m, m_size, crash_on_fail);
 	}
 }
 
