@@ -22,7 +22,7 @@ LogLevel Log::LOG_LEVEL = NONE;
 vector<ProcessInfo> ProcessInfoHelper::PROCESS_LIST;
 ProcessInfo ProcessInfoHelper::SELF;
 ProcessInfo ProcessInfoHelper::LEADER;
-time_t FailureDetector::TIMEOUT = 2;
+time_t FailureDetector::TIMEOUT = 3;
 
 void start_tcp_listener(CommandArgs c_args) {
 	try {
