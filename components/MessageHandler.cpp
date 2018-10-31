@@ -233,14 +233,8 @@ void handle_newleader_message(NewLeaderMessage nlm) {
 	if (nlm.op_type != OP_PENDING) {
 		Log::f("MessageHandler:: The only type of NewLeaderMessage that is handled is PENDING. Received something else.");
 	}
-	<<<<<<< HEAD
-		//Update leader
-		uint32_t new_leader_id = MembershipList::get_instance().get_next_leader_id();
-	update_leader(new_leader_id);
-	=======
-		>>>>>>> part4
-		//Check if pending request exists
-		ReqMessage m = ReqMessage();
+	//Check if pending request exists
+	ReqMessage m = ReqMessage();
 	m.type = NEW_LEADER_RESPONSE;
 	m.req_id = nlm.req_id;
 	m.view_id = MembershipList::get_instance().get_view_id();
