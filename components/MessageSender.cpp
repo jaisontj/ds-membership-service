@@ -10,7 +10,7 @@ void send_message(std::string hostname, std::string port, void *m, size_t m_size
 	TcpSender sender = TcpSender(hostname, port);
 	sender.send(m, m_size);
 	sender.free_serve_info();
-	//sender.close_socket();
+	sender.close_socket();
 }
 
 void send_message(ProcessInfo pInfo, void *m, size_t m_size) {
