@@ -48,7 +48,6 @@ std::vector<uint32_t> remove_from_vector(std::vector<uint32_t> peer_list, uint32
 }
 
 void update_leader(uint32_t new_leader_id) {
-	MembershipList::get_instance().remove_peer(ProcessInfoHelper::LEADER.id);
 	ProcessInfo leader_info = ProcessInfoHelper::get_process_info(new_leader_id);
 	ProcessInfoHelper::LEADER = leader_info;
 }
@@ -161,20 +160,26 @@ void handle_pending_op(ReqMessage m) {
 void handle_leader_failure(uint32_t leader_id) {
 	Log::i("Detected leader failure");
 	//check if next in line to be leader
+	//Update leader
 	uint32_t next_leader_id = MembershipList::get_instance().get_next_leader_id();
+	update_leader(next_leader_id);
+	Log::i("Updated leader: New Leader-> " + std::to_string(next_leader_id));
 	if (ProcessInfoHelper::SELF.id != next_leader_id){
 		Log::i("Not next in line to be leader :(.");
 		return;
 	}
 	//Handle if next in line to be leader
 	Log::i("Assuming leadership ya'll!!!");
+	Log::i("Removing leader from membership");
+	//Delete previous leader from membership
+	MembershipList::get_instance().remove_peer(leader_id);
 	//send NEWLEADER to all except crashed leader.
 	NewLeaderMessage m = NewLeaderMessage();
 	m.type = NEW_LEADER;
 	m.req_id = RequestIdProvider::get_instance().get_new_req_id();
 	m.view_id = MembershipList::get_instance().get_view_id();
 	m.op_type = OP_PENDING;
-	std::vector<uint32_t> alive_peers = remove_from_vector(MembershipList::get_instance().get_peer_list(), leader_id);
+	std::vector<uint32_t> alive_peers = MembershipList::get_instance().get_peer_list();
 	//send message to all alive, but do not crash on fail because someother process also may have crashed.
 	nlr_handler.setup(m.req_id, &handle_pending_op);
 	send_message(alive_peers, (void *) &m, sizeof m, false);
@@ -228,11 +233,14 @@ void handle_newleader_message(NewLeaderMessage nlm) {
 	if (nlm.op_type != OP_PENDING) {
 		Log::f("MessageHandler:: The only type of NewLeaderMessage that is handled is PENDING. Received something else.");
 	}
-	//Update leader
-	uint32_t new_leader_id = MembershipList::get_instance().get_next_leader_id();
+	<<<<<<< HEAD
+		//Update leader
+		uint32_t new_leader_id = MembershipList::get_instance().get_next_leader_id();
 	update_leader(new_leader_id);
-	//Check if pending request exists
-	ReqMessage m = ReqMessage();
+	=======
+		>>>>>>> part4
+		//Check if pending request exists
+		ReqMessage m = ReqMessage();
 	m.type = NEW_LEADER_RESPONSE;
 	m.req_id = nlm.req_id;
 	m.view_id = MembershipList::get_instance().get_view_id();
