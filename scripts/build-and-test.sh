@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIRECTORY="ds_prj2_part3"
+DIRECTORY="ds_prj2_part4"
 NUM_PEERS=5
 
 if [ -z $1 ]
@@ -36,7 +36,7 @@ scp hostnames.txt login.ccs.neu.edu:$DIRECTORY
 clear
 
 echo "Step 4: Running test case"
-sh test3.sh $DIRECTORY
+sh test4.sh $DIRECTORY
 echo $STEP_LINES
 clear
 
