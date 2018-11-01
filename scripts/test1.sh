@@ -16,7 +16,6 @@ for host in $(cat $HOSTNAMES);
 do
 	echo "Running on $host"
 	ssh $host "cd $DIRECTORY && $COMMAND_RUN" >> log/output.$host &
-	echo ""
 	sleep 3
 done
 
