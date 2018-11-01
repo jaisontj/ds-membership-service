@@ -169,7 +169,7 @@ void handle_leader_failure(uint32_t leader_id) {
 		return;
 	}
 	//Handle if next in line to be leader
-	Log::i("Assuming leadership ya'll!!!");
+	Log::p("Assuming leadership!!!");
 	//Delete previous leader from membership
 	MembershipList::get_instance().remove_peer(leader_id);
 	//send NEWLEADER to all except crashed leader.
