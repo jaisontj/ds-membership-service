@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIRECTORY="ds_prj2_part2"
-NUM_PEERS=8
+NUM_PEERS=5
 
 if [ -z $1 ]
 then
